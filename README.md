@@ -67,4 +67,5 @@ Assets/
 ## 버전 관리
 
 - Git / GitHub 사용
-- 브랜치: `main`(README 전용), `master`(실제 작업 브랜치, 프로젝트 전체 파일)
+- 브랜치: `main`(README 전용), `master`(실제 작업 브랜치, 프로젝트 전체 파일) — 두 브랜치는 공통 조상 없는 별개 히스토리
+- 미니게임별 feature 브랜치: `feature/fps-minigame`, `feature/pk-minigame`, `feature/lavariver-minigame` — master에서 분기, 완료 시 각각 master로 병합
