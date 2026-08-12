@@ -67,3 +67,4 @@ Assets/
 ## 버전 관리
 
 - Git / GitHub 사용
+- 브랜치: `main`(README 전용), `master`(실제 작업 브랜치, 프로젝트 전체 파일)
