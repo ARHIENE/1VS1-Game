@@ -14,3 +14,8 @@
 - **README.md 신규 작성**: 개발 환경/씬 구성/프로젝트 구조/미니게임(FPS·PK·LavaRiver·TheRift)/스크린샷(자리만)/향후 계획(미니게임 추가 예정, Claude 활용 TC 작성 및 QA 예정) 구성
 - 전역 CLAUDE.md에 규칙 추가: SAVE 시 main README.md도 최신화할 것
 - 남은 작업: 골키퍼 Animator 트리거 6개 연결, PK 인스펙터 레퍼런스 확인, 2인 실플레이 테스트, README 스크린샷 추가
+
+### 추가 세션 — 저장소 공개 검토 및 미니게임별 브랜치 분리
+- **Public 전환 검토 후 보류**: 커밋 히스토리 스캔 결과 `PhotonServerSettings.asset`에 실제 Photon App ID 하드코딩 확인 → 노출 위험으로 사용자가 보류 결정. 재발급 전까지 재경고하기로 함
+- **미니게임별 feature 브랜치 도입**: master에서 개별 분기(형제 관계) 후 완료 시 각각 master로 병합하는 워크플로 확립. `feature/fps-minigame`, `feature/pk-minigame`, `feature/lavariver-minigame` 생성 및 origin push 완료. `TheRift`는 스크립트 없어 제외
+- git 브랜치가 폴더처럼 계층 구조가 아니라 커밋 기반 형제 관계라는 점, 분기(master→feature)와 병합(feature→master) 방향이 반대라는 점을 사용자에게 다이어그램으로 설명

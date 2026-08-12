@@ -56,6 +56,16 @@
 4. MiniGame2 씬에서 2인 실제 플레이 테스트, 카메라/오차감/타이머 체감 튜닝
 5. README.md 스크린샷/이미지 추가
 
+## Git 저장소 공개 여부
+- **Public 전환 보류 중** (2026-08-13 결정)
+- 사유: `Assets/Photon/PhotonUnityNetworking/Resources/PhotonServerSettings.asset`에 실제 Photon App ID(`AppIdRealtime`)가 하드코딩되어 커밋 히스토리에 존재 → 그대로 노출 시 무단 사용/쿼터 소진 위험
+- 재요청 시 먼저 확인할 것: (1) Photon Dashboard에서 App ID 재발급 (2) 새 값은 커밋 제외 처리 (3) 기존 히스토리에서 값 제거(git filter-repo 등) 여부
+
+## 미니게임별 feature 브랜치
+- master에서 개별 분기(형제 관계, 계층 아님), 완료 후 각각 master로 병합하는 방식으로 운영하기로 함
+- 현재 생성 및 origin push 완료: `feature/fps-minigame`, `feature/pk-minigame`, `feature/lavariver-minigame` (모두 master 최신 커밋 기준, 아직 병합 전)
+- `TheRift`는 씬 파일만 있고 연결된 스크립트 없어 제외 (요청 시 추가 가능)
+
 ## 다음 세션 참고
 - 세션 시작 시 이 파일을 먼저 읽고 구조/진행상황 파악할 것
 - SAVE 명령 시: (1) 이 파일 갱신 (2) 이전 내용은 날짜와 함께 changelog.md로 이관 (3) main의 README.md도 최신화
