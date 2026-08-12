@@ -1,0 +1,12 @@
+{
+    "asset": "741be057ef7c6de4b990c9e8220f46e7",
+    "fileName": "019e6ab7-247e-7358-90f9-febd4545f790.pose.json",
+    "prompt": "A humanoid character performing a powerful soccer kick motion with the right leg, starting from a standing position and returning to idle.",
+    "negativePrompt": "",
+    "model": "unity-text-to-motion",
+    "modelName": "Text to Motion",
+    "customSeed": 389972210,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "isTrimmed": false
+}

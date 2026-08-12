@@ -1,0 +1,75 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f3758f8f58fdef43803eb9be1df0608, type: 3}
+  m_Name: PhotonServerSettings
+  m_EditorClassIdentifier: PhotonUnityNetworking::Photon.Pun.ServerSettings
+  AppSettings:
+    AppIdRealtime: d8dd1aa6-3f56-4427-84b2-4bcb2693d1cd
+    AppIdFusion: 
+    AppIdChat: 
+    AppIdVoice: 
+    AppVersion: 
+    UseNameServer: 1
+    FixedRegion: 
+    Server: 
+    Port: 0
+    ProxyServer: 
+    Protocol: 0
+    EnableProtocolFallback: 1
+    AuthMode: 0
+    EnableLobbyStatistics: 0
+    NetworkLogging: 1
+  DevRegion: 
+  PunLogging: 0
+  EnableSupportLogger: 0
+  RunInBackground: 1
+  StartInOfflineMode: 0
+  RpcList:
+  - ClickRpc
+  - DestroyRpc
+  - DestroySpaceship
+  - Fire
+  - RespawnSpaceship
+  - RPC_FireChain
+  - RPC_GetPulled
+  - RPC_FireProjectile
+  - RPC_SyncHealth
+  - RPC_TakeDamage
+  - RPC_RecoverHealth
+  - RPC_Die
+  - RPC_PlayFootstep
+  - RPC_PlayLand
+  - RPC_SetCrouch
+  - GenerateMap
+  - OnHeadShot
+  - OnMinigameResult
+  - OnRespawned
+  - RPC_RespawnAll
+  - RPC_SyncScore
+  - SetKillerRPC
+  - RPC_TriggerJump
+  - RPC_ShowTracer
+  - RPC_SpawnBulletHole
+  - RPC_BounceOff
+  - RPC_Dive
+  - RPC_GoalScored
+  - RPC_Kick
+  - RPC_NoGoal
+  - RPC_ResetBall
+  - RPC_Result
+  - RPC_SelectZone
+  - RPC_CommitDive
+  - RPC_SetGoalkeeperReady
+  - RPC_SetKickerReady
+  DisableAutoOpenWizard: 1
+  ShowSettings: 0
+  DevRegionSetOnce: 1

@@ -1,0 +1,12 @@
+{
+    "asset": "00434b49d4816fe41962fe94b59fc6a9",
+    "fileName": "019e6ab9-4ce0-7531-8cdf-209433a136ae.pose.json",
+    "prompt": "A professional soccer player taking one step forward with the left foot and performing a powerful, dramatic right-leg kick with a high follow-through arc, like a Cristiano Ronaldo free kick. The movement is athletic and forceful.",
+    "negativePrompt": "",
+    "model": "unity-text-to-motion",
+    "modelName": "Text to Motion",
+    "customSeed": 1835855037,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "isTrimmed": false
+}

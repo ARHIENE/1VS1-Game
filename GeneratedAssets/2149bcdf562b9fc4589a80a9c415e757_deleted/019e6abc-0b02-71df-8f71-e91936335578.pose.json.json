@@ -1,0 +1,12 @@
+{
+    "asset": "2149bcdf562b9fc4589a80a9c415e757",
+    "fileName": "019e6abc-0b02-71df-8f71-e91936335578.pose.json",
+    "prompt": "A professional soccer player performing a powerful right-foot shot. The body leans deeply to the left, the left arm is extended wide for balance, and the right leg follows through in a high, dynamic arc. This is an explosive and athletic shooting motion, exactly matching the iconic posture of Son Heung-min in the provided reference images.",
+    "negativePrompt": "",
+    "model": "unity-text-to-motion",
+    "modelName": "Text to Motion",
+    "customSeed": 1026523598,
+    "w3CTraceId": "",
+    "feedback": 0,
+    "isTrimmed": false
+}
