@@ -3,7 +3,7 @@
 ## 개요
 - Unity + Photon(PUN2) 기반 멀티플레이어 미니게임 모음 프로젝트
 - 프로젝트 루트(작업 디렉토리): `E:\Git\1VS1 Game`
-- 버전관리: Plastic SCM(Unity Version Control)이 기존부터 사용 중. 별도로 git 저장소도 초기화됨(에셋 재구성 작업 안전망 용도, `.gitignore` 있음). **git에는 재구성 전 스냅샷 1개 커밋만 있고, 이후 폴더 재구성 변경사항은 git에 커밋 안 함**(사용자 요청). Plastic 쪽 체크인은 사용자가 직접 해야 함.
+- 버전관리: **Plastic SCM 사용 중단, Git/GitHub로 전환**(사용자 결정). git 저장소는 기존부터 초기화되어 있었음(`.gitignore` 있음). 커밋은 사용자가 직접 진행.
 
 ## 씬 구성
 - LauncherScene: 접속/초기 진입 → Launcher.cs
@@ -42,7 +42,7 @@
 2. `PKGoalkeeperCursor`가 Canvas 자식으로 배치되어 있는지 확인
 3. 각 PK 스크립트 인스펙터 레퍼런스 연결 확인(특히 `PKUIManager.timerText`는 이번에 추가된 신규 필드라 UI 요소를 새로 만들어 연결해야 함)
 4. MiniGame2 씬에서 2인 실제 플레이 테스트, 카메라/오차감/타이머 체감 튜닝
-5. Plastic SCM에서 파일 재구성이 "이동"으로 잘 잡혔는지 Pending Changes 확인 후 체크인
+5. GitHub 저장소 생성 후 push (사용자가 직접 진행 예정)
 
 ## 다음 세션 참고
 - 세션 시작 시 이 파일을 먼저 읽고 구조/진행상황 파악할 것
