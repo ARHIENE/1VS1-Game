@@ -64,11 +64,26 @@ public class PKBall : MonoBehaviourPun
         float duration = Mathf.Clamp(length / Mathf.Max(travelSpeed, 0.01f), minTravelDuration, maxTravelDuration);
 
         float elapsed = 0f;
+        Vector3 lastPos = transform.position;
+
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / duration);
-            transform.position = SampleAlongPath(path, t);
+            Vector3 currentPos = SampleAlongPath(path, t);
+
+            Vector3 moveDelta = currentPos - lastPos;
+            if (moveDelta.sqrMagnitude > 0.0001f)
+            {
+                Vector3 spinAxis = Vector3.Cross(Vector3.up, moveDelta.normalized);
+                if (spinAxis.sqrMagnitude > 0.001f)
+                {
+                    transform.Rotate(spinAxis, moveDelta.magnitude * 360f, Space.World);
+                }
+            }
+
+            transform.position = currentPos;
+            lastPos = currentPos;
             yield return null;
         }
 

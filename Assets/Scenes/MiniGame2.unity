@@ -1894,10 +1894,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PKGoalDetector
   gameManager: {fileID: 1583362823}
-  goalkeeper: {fileID: 0}
-  goalCenter: {x: 0, y: 1.22, z: 10}
-  goalHalfWidth: 3.66
-  goalHeight: 2.44
 --- !u!114 &410417682
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2524,10 +2520,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PKPowerGauge
   gaugeSlider: {fileID: 545847085}
   fillImage: {fileID: 1857906887}
+  powerPercentText: {fileID: 1938385516}
   lowColor: {r: 0, g: 1, b: 0, a: 1}
   midColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   highColor: {r: 1, g: 0, b: 0, a: 1}
   oscillateSpeed: 2.2
+  perfectHalfWidth: 0.08
 --- !u!1001 &559748698
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3483,6 +3481,8 @@ MonoBehaviour:
   scoreText: {fileID: 141760007}
   kickCountText: {fileID: 636897473}
   roleText: {fileID: 131265630}
+  timerText: {fileID: 0}
+  timerSlider: {fileID: 474906131}
   kickerGuidePanel: {fileID: 1097575998}
   kickerGuideText: {fileID: 1645275740}
   gkGuidePanel: {fileID: 346472}
@@ -3507,11 +3507,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PKGoalkeeperCursor
   goalkeeper: {fileID: 0}
-  cursorUI: {fileID: 1286749834}
-  mainCamera: {fileID: 0}
-  goalTopLeft: {fileID: 794176852}
-  goalBottomRight: {fileID: 448393385}
-  cursorRadius: 40
+  mainCamera: {fileID: 985872270}
+  canvas: {fileID: 1370960513}
+  panelSize: {x: 90, y: 70}
+  normalColor: {r: 1, g: 1, b: 1, a: 0.25}
+  hoverColor: {r: 1, g: 0.85, b: 0.2, a: 0.5}
+  fontSize: 36
 --- !u!1001 &810294657
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3910,8 +3911,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 985872268}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.08715574, y: 0, z: 0, w: 0.9961947}
+  m_LocalPosition: {x: 0, y: 1.5, z: -4}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3924,7 +3925,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 985872268}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 32de7f585d77ef14c826cb6b1f2566ef, type: 3}
   m_Name: 
@@ -4166,9 +4167,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed9d31da5f0124443a48e3e59f6c0572, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PKBall
-  drag: 0.5
-  angularDrag: 0.8
-  bodyBounceForce: 0.6
+  travelSpeed: 16
+  minTravelDuration: 0.6
+  maxTravelDuration: 1.6
 --- !u!114 &1008825950
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5881,7 +5882,11 @@ MonoBehaviour:
   gkCursor: {fileID: 805366715}
   uiManager: {fileID: 805366714}
   ballSpawnPoint: {fileID: 1196530176}
+  goalCenter: {x: 0, y: 1.22, z: 10}
+  goalHalfWidth: 3.66
+  goalHeight: 2.44
   roundsPerTeam: 5
+  turnTimeLimit: 10
   ballResultTimeout: 5
   resultDisplayTime: 2
   localTeam: 0

@@ -796,11 +796,9 @@ MonoBehaviour:
   trajectoryLine: {fileID: 0}
   mainCamera: {fileID: 0}
   ballTransform: {fileID: 0}
-  trajectorySteps: 40
-  trajectoryTimeStep: 0.05
-  minLaunchSpeed: 6
-  maxLaunchSpeed: 28
+  maxDrawDuration: 1.4
   startClickRadius: 80
+  maxMissDeviation: 4.5
 --- !u!114 &8832755242167572114
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -816,12 +814,8 @@ MonoBehaviour:
   diveSpeed: 12
   diveDuration: 0.6
   returnSpeed: 3
-  goalCenter: {x: 0, y: 1.22, z: 10}
-  goalHalfWidth: 3.66
-  goalHeight: 2.44
   gkBody: {fileID: 0}
   mainCamera: {fileID: 0}
-  blockRadius: 0.7
 --- !u!4 &6692841780240889870 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2faa610713d3b3c439473daa55e8c60a, type: 3}

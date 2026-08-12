@@ -1,14 +1,16 @@
 using System;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 // Canvas 위 파워게이지 오브젝트에 붙임
-// 마우스 클릭으로 게이지를 정지시키며, Perfect(중앙)와의 거리로 슛 정확도가 결정된다.
+// 마우스 클릭 또는 스페이스바 입력으로 게이지를 정지시키며, Perfect(중앙)와의 거리로 슛 정확도가 결정된다.
 public class PKPowerGauge : MonoBehaviour
 {
     [Header("UI")]
     public Slider gaugeSlider;
     public Image fillImage;
+    public TextMeshProUGUI powerPercentText;
     public Color lowColor  = Color.green;
     public Color midColor  = Color.yellow;
     public Color highColor = Color.red;
@@ -30,6 +32,12 @@ public class PKPowerGauge : MonoBehaviour
     public float GetCurrentPower() => gaugeValue;
     public float GetAccuracyError() => PKTrajectoryUtil.GetAccuracyError(gaugeValue, perfectHalfWidth);
 
+    void Start()
+    {
+        if (powerPercentText == null)
+            powerPercentText = GetComponentInChildren<TextMeshProUGUI>();
+    }
+
     void Update()
     {
         if (!isRunning) return;
@@ -49,7 +57,13 @@ public class PKPowerGauge : MonoBehaviour
                 : Color.Lerp(midColor, highColor, (t - 0.5f) * 2f);
         }
 
-        if (Input.GetMouseButtonDown(0))
+        if (powerPercentText != null)
+        {
+            float pct = gaugeValue * 100f;
+            powerPercentText.text = $"{pct:F0}%";
+        }
+
+        if (Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Space))
         {
             StopGaugeInternal();
         }
@@ -61,14 +75,23 @@ public class PKPowerGauge : MonoBehaviour
         gaugeValue = 0f;
         direction  = 1f;
         if (gaugeSlider != null) gaugeSlider.gameObject.SetActive(true);
+        if (powerPercentText != null) powerPercentText.gameObject.SetActive(true);
     }
 
-    // 정상 정지(클릭)든 강제 정지(타임아웃)든 공용으로 사용
+    // 정상 정지(클릭/스페이스)든 강제 정지(타임아웃)든 공용으로 사용
     void StopGaugeInternal()
     {
         if (!isRunning) return;
         isRunning = false;
-        if (gaugeSlider != null) gaugeSlider.gameObject.SetActive(false);
+
+        float err = GetAccuracyError();
+        if (powerPercentText != null)
+        {
+            if (err <= 0.01f) powerPercentText.text = "PERFECT!";
+            else if (err <= 0.4f) powerPercentText.text = "GREAT!";
+            else powerPercentText.text = "MISS!";
+        }
+
         OnStopped?.Invoke(gaugeValue);
     }
 
@@ -84,5 +107,6 @@ public class PKPowerGauge : MonoBehaviour
         StopGauge();
         gaugeValue = 0f;
         if (gaugeSlider != null) gaugeSlider.value = 0f;
+        if (powerPercentText != null) powerPercentText.text = "0%";
     }
 }

@@ -12,6 +12,7 @@ public class PKUIManager : MonoBehaviour
     public TextMeshProUGUI kickCountText;
     public TextMeshProUGUI roleText;
     public TextMeshProUGUI timerText;
+    public Slider          timerSlider;
 
     [Header("Kicker Guide")]
     public GameObject      kickerGuidePanel;
@@ -106,7 +107,13 @@ public class PKUIManager : MonoBehaviour
 
     public void UpdateTimer(float remaining)
     {
-        if (timerText) timerText.text = Mathf.CeilToInt(Mathf.Max(remaining, 0f)).ToString();
+        float val = Mathf.Max(remaining, 0f);
+        if (timerText) timerText.text = Mathf.CeilToInt(val).ToString();
+        if (timerSlider)
+        {
+            timerSlider.maxValue = PKGameManager.Instance != null ? PKGameManager.Instance.turnTimeLimit : 10f;
+            timerSlider.value = val;
+        }
     }
 
     public void ShowWaitingForOpponent(bool isKicker)

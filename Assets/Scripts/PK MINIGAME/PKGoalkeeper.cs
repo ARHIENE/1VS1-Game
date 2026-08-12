@@ -73,17 +73,21 @@ public class PKGoalkeeper : MonoBehaviourPun
 
     void Update()
     {
-        if (!photonView.IsMine) return;
+        bool isMine = photonView == null || photonView.IsMine;
 
-        bool canSelect = isMyTurn && !hasDived;
-
-        if (canSelect)
+        if (isMine && isMyTurn && !hasDived)
+        {
             HandleZoneClick();
+        }
 
         if (isDiving)
+        {
             UpdateDive();
+        }
         else if (isMyTurn && !hasDived && gkBody != null)
+        {
             gkBody.position = Vector3.MoveTowards(gkBody.position, startPos, returnSpeed * Time.deltaTime);
+        }
     }
 
     // ─────────────────────────────────────────────
@@ -92,16 +96,19 @@ public class PKGoalkeeper : MonoBehaviourPun
     void HandleZoneClick()
     {
         if (!Input.GetMouseButtonDown(0)) return;
+        if (mainCamera == null) mainCamera = Camera.main;
         if (mainCamera == null) return;
 
         Vector3 goalCenter = GoalCenter;
-        Ray   ray   = mainCamera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
         if (Mathf.Abs(ray.direction.z) < 0.0001f) return;
 
         float t = (goalCenter.z - ray.origin.z) / ray.direction.z;
         if (t < 0f) return;
 
         Vector3 worldHit = ray.origin + ray.direction * t;
+        if (!PKGoalZones.IsInsideGoal(worldHit, goalCenter, GoalHalfWidth, GoalHeight)) return;
+
         int zone = PKGoalZones.GetZoneFromPosition(worldHit, goalCenter, GoalHalfWidth, GoalHeight);
         CommitZone(zone);
     }
@@ -160,7 +167,15 @@ public class PKGoalkeeper : MonoBehaviourPun
         if (anim != null)
         {
             anim.SetBool("IsGoalkeeper", true);
-            anim.SetTrigger($"GoalkeeperDive{zone}");
+            // Zones 1, 4, 2 dive left; Zones 3, 6, 5 dive right
+            if (zone == 1 || zone == 4 || zone == 2)
+            {
+                anim.SetTrigger("GoalkeeperDiveLeft");
+            }
+            else
+            {
+                anim.SetTrigger("GoalkeeperDiveRight");
+            }
         }
     }
 

@@ -26,6 +26,10 @@ public class PKGameManager : MonoBehaviourPun
     public float ballResultTimeout  = 5f;
     public float resultDisplayTime  = 2.5f;
 
+    [Header("Camera (역할 무관 고정 시점)")]
+    public Vector3 cameraPosition    = new Vector3(0f, 2.8f, -7.5f);
+    public Vector3 cameraEulerAngles = new Vector3(18f, 0f, 0f);
+
     private int  scoreA = 0, scoreB = 0;
     private int  kicksA = 0, kicksB = 0;
 
@@ -67,23 +71,50 @@ public class PKGameManager : MonoBehaviourPun
     public PKGoalkeeper GetDefendingGoalkeeper()
     {
         PKGoalkeeper[] gks = FindObjectsByType<PKGoalkeeper>(FindObjectsSortMode.None);
+        if (gks.Length == 0) return goalkeeper;
+        if (gks.Length == 1) return gks[0];
+
         foreach (var gk in gks)
         {
+            if (gk.photonView == null || gk.photonView.Owner == null) continue;
+            bool isMaster = gk.photonView.Owner.IsMasterClient;
             if (isTeamATurn)
             {
-                if (!gk.photonView.IsMine) return gk;
+                if (!isMaster) return gk;
             }
             else
             {
-                if (gk.photonView.IsMine) return gk;
+                if (isMaster) return gk;
             }
         }
-        return goalkeeper;
+        return goalkeeper != null ? goalkeeper : gks[0];
+    }
+
+    public PKKicker GetActiveKicker()
+    {
+        PKKicker[] kickers = FindObjectsByType<PKKicker>(FindObjectsSortMode.None);
+        if (kickers.Length == 0) return kicker;
+        if (kickers.Length == 1) return kickers[0];
+
+        foreach (var k in kickers)
+        {
+            if (k.photonView == null || k.photonView.Owner == null) continue;
+            bool isMaster = k.photonView.Owner.IsMasterClient;
+            if (isTeamATurn)
+            {
+                if (isMaster) return k;
+            }
+            else
+            {
+                if (!isMaster) return k;
+            }
+        }
+        return kicker != null ? kicker : kickers[0];
     }
 
     void Start()
     {
-        localTeam = PhotonNetwork.IsMasterClient ? Team.A : Team.B;
+        localTeam = (PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient) ? Team.B : Team.A;
         StartCoroutine(DelayedStart());
     }
 
@@ -101,8 +132,8 @@ public class PKGameManager : MonoBehaviourPun
         lockedRealTrajectory = null;
         lockedGkZone    = 0;
 
-        ball.ResetBall(ballSpawnPoint.position);
-        goalDetector.ResetDecision();
+        ball.ResetBall(ballSpawnPoint != null ? ballSpawnPoint.position : new Vector3(0f, 0.11f, -1.0f));
+        if (goalDetector != null) goalDetector.ResetDecision();
 
         // Dynamically find local player references if not registered yet
         if (kicker == null || goalkeeper == null)
@@ -110,7 +141,7 @@ public class PKGameManager : MonoBehaviourPun
             PKKicker[] kickers = FindObjectsByType<PKKicker>(FindObjectsSortMode.None);
             foreach (var k in kickers)
             {
-                if (k.photonView.IsMine)
+                if (k.photonView == null || k.photonView.IsMine)
                 {
                     kicker = k;
                     goalkeeper = k.GetComponent<PKGoalkeeper>();
@@ -127,24 +158,35 @@ public class PKGameManager : MonoBehaviourPun
             ball.photonView.TransferOwnership(PhotonNetwork.LocalPlayer);
         }
 
-        // Position/rotate the local player GameObject for their current role
-        Transform localPlayerTrans = kicker != null ? kicker.transform : (goalkeeper != null ? goalkeeper.transform : null);
-        if (localPlayerTrans != null)
+        // --- 카메라: 역할과 무관하게 항상 공격자 뒤에서 골대를 보는 고정 시점 ---
+        Camera mainCam = Camera.main;
+        if (mainCam != null)
         {
-            CharacterController cc = localPlayerTrans.GetComponent<CharacterController>();
+            CameraFollow camFollow = mainCam.GetComponent<CameraFollow>();
+            if (camFollow != null) camFollow.enabled = false;
+
+            mainCam.transform.position = cameraPosition;
+            mainCam.transform.rotation = Quaternion.Euler(cameraEulerAngles);
+        }
+
+        // Position ALL player GameObjects according to their current turn roles
+        PKKicker curKicker = GetActiveKicker();
+        PKKicker[] allKickers = FindObjectsByType<PKKicker>(FindObjectsSortMode.None);
+        foreach (var k in allKickers)
+        {
+            CharacterController cc = k.GetComponent<CharacterController>();
             if (cc != null) cc.enabled = false;
 
-            if (localIsKicker)
+            if (k == curKicker)
             {
-                localPlayerTrans.position = new Vector3(0f, 0f, -3.0f);
-                localPlayerTrans.rotation = Quaternion.identity; // Facing +z (at goal)
+                k.transform.position = new Vector3(0f, 0f, -3.0f);
+                k.transform.rotation = Quaternion.identity; // Facing +z (at goal)
             }
             else
             {
-                localPlayerTrans.position = new Vector3(0f, 0f, 10.0f);
-                localPlayerTrans.rotation = Quaternion.Euler(0f, 180f, 0f); // Facing -z (at kicker)
+                k.transform.position = new Vector3(0f, 0f, 10.0f);
+                k.transform.rotation = Quaternion.Euler(0f, 180f, 0f); // Facing -z (at kicker)
             }
-            // Keep CharacterController DISABLED to prevent floating/upward snapping bugs in the PK minigame!
         }
 
         if (kicker != null) kicker.IsMyTurn    = localIsKicker;
@@ -152,14 +194,6 @@ public class PKGameManager : MonoBehaviourPun
 
         // 골키퍼 구역 선택 UI: 골키퍼 턴인 로컬 플레이어에게만 표시, 공격자에게는 절대 비노출
         gkCursor?.SetActive(!localIsKicker);
-
-        // --- 카메라: 역할과 무관하게 항상 공격자 뒤에서 골대를 보는 고정 시점 ---
-        Camera mainCam = Camera.main;
-        if (mainCam != null)
-        {
-            mainCam.transform.position = new Vector3(0f, 1.5f, -4f);
-            mainCam.transform.rotation = Quaternion.Euler(10f, 0f, 0f);
-        }
 
         uiManager?.UpdateTurnUI(localIsKicker, isTeamATurn,
             scoreA, scoreB, kicksA, kicksB, inSuddenDeath, sdPair);
@@ -209,23 +243,6 @@ public class PKGameManager : MonoBehaviourPun
             if (resultWaitCoroutine != null) StopCoroutine(resultWaitCoroutine);
             resultWaitCoroutine = StartCoroutine(ExecutePKRoutine());
         }
-    }
-
-    public PKKicker GetActiveKicker()
-    {
-        PKKicker[] kickers = FindObjectsByType<PKKicker>(FindObjectsSortMode.None);
-        foreach (var k in kickers)
-        {
-            if (isTeamATurn)
-            {
-                if (k.photonView.Owner.IsMasterClient) return k;
-            }
-            else
-            {
-                if (!k.photonView.Owner.IsMasterClient) return k;
-            }
-        }
-        return kicker;
     }
 
     IEnumerator ExecutePKRoutine()
