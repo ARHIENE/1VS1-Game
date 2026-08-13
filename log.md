@@ -95,11 +95,11 @@
 
 ## 미니게임별 feature 브랜치
 - master에서 개별 분기(형제 관계, 계층 아님), 완료 후 각각 master로 병합하는 방식으로 운영하기로 함
-- 현재 생성 및 origin push 완료: `feature/fps-minigame`, `feature/pk-minigame`, `feature/lavariver-minigame` (모두 master 최신 커밋 기준, 아직 병합 전)
-- `feature/gomoku3d-minigame`: 로컬에 생성 완료(2026-08-13), **origin push 전**. 3D 오목 스크립트 작업 중(현재 브랜치)
+- 4개 전부 origin push 완료(아직 master로 병합 전): `feature/fps-minigame`, `feature/pk-minigame`, `feature/lavariver-minigame`, `feature/gomoku3d-minigame`(현재 브랜치)
+- **2026-08-14: 4개 브랜치 전부에 각 미니게임 전용 README.md 추가**(게임 설명/조작법/스크립트별 구현 방식). `master`/`main`에는 없고 각 feature 브랜치 루트에만 존재
 - `TheRift`는 씬 자체가 삭제되어 더 이상 해당 없음
 
 ## 다음 세션 참고
 - 세션 시작 시 이 파일을 먼저 읽고 구조/진행상황 파악할 것
 - 3D 오목: 스크립트는 완성 상태. Unity 에디터에서 컴포넌트 배치/PhotonView 추가/UI 연결이 어디까지 진행됐는지 먼저 확인할 것(위 체크리스트 참고)
-- SAVE 명령 시: (1) 이 파일 갱신 (2) 이전 내용은 날짜와 함께 changelog.md로 이관 (3) main의 README.md도 최신화
+- SAVE 명령 시(전역 CLAUDE.md 규칙, 2026-08-14 확장): (1) 이 파일 갱신 (2) 이전 내용은 날짜와 함께 changelog.md로 이관 (3) main의 README.md 최신화(신규/변경 미니게임 간단 설명 추가) (4) 세션 중 새로 만든 미니게임이 있으면 전용 feature 브랜치 생성 후 커밋·push (5) 기존 미니게임 규칙이 바뀌었으면 해당 feature 브랜치 README.md도 수정 후 커밋·push
