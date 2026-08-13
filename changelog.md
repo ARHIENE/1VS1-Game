@@ -19,3 +19,21 @@
 - **Public 전환 검토 후 보류**: 커밋 히스토리 스캔 결과 `PhotonServerSettings.asset`에 실제 Photon App ID 하드코딩 확인 → 노출 위험으로 사용자가 보류 결정. 재발급 전까지 재경고하기로 함
 - **미니게임별 feature 브랜치 도입**: master에서 개별 분기(형제 관계) 후 완료 시 각각 master로 병합하는 워크플로 확립. `feature/fps-minigame`, `feature/pk-minigame`, `feature/lavariver-minigame` 생성 및 origin push 완료. `TheRift`는 스크립트 없어 제외
 - git 브랜치가 폴더처럼 계층 구조가 아니라 커밋 기반 형제 관계라는 점, 분기(master→feature)와 병합(feature→master) 방향이 반대라는 점을 사용자에게 다이어그램으로 설명
+
+## 2026-08-13 ~ 2026-08-14 — 3D 오목(입체 오목) 미니게임 신규 구현
+`feature/gomoku3d-minigame` 브랜치(로컬, origin 미push)에서 진행. 스펙이 세 차례에 걸쳐 확장됨: 5x5x5 기본 규칙 → 15x15x15(3375칸, 표준 오목판 크기 반영) → 바둑판 시각 요소(나무 재질+격자선) 요구사항 추가.
+
+**스크립트 7개 신규 작성** (`Assets/Scripts/GOMOKU MINIGAME/`): `GomokuGrid`(순수 C# 보드 데이터), `GomokuWinChecker`(static 13방향 판정 유틸, PK의 `PKGoalZones` 컨벤션 따름), `GomokuTurnManager`(MonoBehaviourPun 싱글턴, RPC 동기화 허브), `GomokuStoneSpawner`(좌표 변환+보드 시각 요소+돌 생성), `GomokuInputHandler`(클릭 판정+마커), `GomokuVisualHighlighter`(승리 라인 강조), `GomokuSeatedCamera`(1인칭 착석 카메라, 애초 이름은 `GomokuOrbitCamera`였다가 요구사항이 궤도 회전→착석 시점으로 바뀌면서 교체됨).
+
+**주요 설계 결정**
+- 돌 배치는 결정론적 로직이라 `(x,y,player)`만 RPC로 보내면 양쪽이 동일한 결과에 도달 — PhotonNetwork.Instantiate 없이 PK와 동일한 RPC 패턴 재사용
+- 상대 아바타 머리 회전, 보드 90도 회전(Q/E)도 전부 같은 방식(기존 GomokuTurnManager PhotonView RPC 재사용)으로 동기화 — 새 프리팹/Resources 등록 일절 불필요
+- 좌석 아바타 2개(내 자리 숨김/상대 자리 표시)를 양쪽 클라이언트가 로컬에서 동일하게 생성, 머리 회전만 RPC로 전파
+- 보드 전체(플레인+격자선+돌)는 `boardRoot`라는 회전 가능한 자식 Transform 아래 구성해서 Q/E로 통째로 돌아가게 함
+
+**발견·수정한 버그 3건**
+1. 기둥 콜라이더가 바닥~15층까지 뚫린 "벽"처럼 동작해 앞줄이 뒷줄 클릭을 가려버림(카메라 각도가 낮을수록 심해짐) → Plane.Raycast 기반 지면 교차 방식으로 전환해 근본 해결
+2. 카메라 눈높이/좌석거리가 사람 스케일 고정값(1.6m/3m)이라 15층(18유닛) 규모 보드와 안 맞아 거의 수평으로 보임 → 보드 전체 폭 비율 기반(`eyeHeightRatio`/`seatSetbackRatio`) 계산으로 전환, 사용자가 에디터에서 직접 찾은 좌표에 맞춰 최종 튜닝
+3. 보드 회전 피벗이 모서리(원점)에 있어 Q/E로 돌리면 보드가 화면 밖으로 튕겨나감 → `boardRoot`를 보드 중심으로 이동, 관련 좌표 계산 전부 수정
+
+**남은 작업**: 씬(`MiniGame_Gomoku3D`)은 사용자가 직접 생성 완료(에디터에서 진행), 컴포넌트 부착/PhotonView 추가/UI 연결 등은 다음 세션에서 진행 상태 확인 필요(체크리스트는 log.md 참고). PK 미니게임 씬도 이 세션 중 사용자가 `MiniGame2.unity` → `MiniGame_PK.unity`로 이름 변경, `TheRift.unity` 삭제.

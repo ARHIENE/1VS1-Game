@@ -71,6 +71,9 @@ MonoBehaviour:
   - RPC_SetGoalkeeperReady
   - RPC_SetKickerReady
   - RPC_KickAlongPath
+  - RPC_PlaceStone
+  - RPC_UpdateHeadLook
+  - RPC_RotateBoard
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

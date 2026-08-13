@@ -16,8 +16,10 @@
 - LobbyScene: 로비, 방 생성/참가 → LobbyManager.cs
 - GameScene: 메인 게임 씬 → GameManager.cs, MiniGameSelector.cs
 - MiniGame1: FPS 미니게임 전용 씬
-- MiniGame2: PK(승부차기) 미니게임 전용 씬
-- MiniGame_LavaRiver, TheRift: 아직 스크립트 연결 확인 안 됨(직접 참조 스크립트 없음)
+- MiniGame_PK: PK(승부차기) 미니게임 전용 씬 (구 `MiniGame2.unity`, 2026-08-14 사용자가 네이밍 일관성 위해 리네임)
+- MiniGame_LavaRiver: 아직 스크립트 연결 확인 안 됨(직접 참조 스크립트 없음)
+- MiniGame_Gomoku3D: 3D 오목 미니게임 전용 씬 (2026-08-14 사용자가 신규 생성, 컴포넌트 배치는 진행 상황 확인 필요)
+- ~~TheRift~~: 2026-08-14 사용자가 삭제(스크립트 연결 없어서 정리)
 
 ## Assets/Scripts 폴더 구조
 씬 GUID 참조 분석 기반으로 정리됨 (원래 이름 유지, 임의 그룹핑 안 함)
@@ -27,10 +29,11 @@
 - `Common/` AnimatorDebugger, AOSController, CameraFollow, PlayerController, PlayerSetup, MiniGameManager (여러 씬 공용 컴포넌트)
 - `FPS MINIGAME/` FPS 전용
 - `PK MINIGAME/` PK 전용 (아래 참고)
+- `GOMOKU MINIGAME/` 3D 오목 전용 (아래 참고)
 - `Unused/` AOSCameraFollow, AnimatorFixer, ChainProjectile, DeathZone — 어떤 씬에서도 직접 참조 미확인
 
 ## PK(승부차기) 미니게임 — 스펙대로 전면 재구현 완료
-대상 씬: MiniGame2. 스크립트: `Assets/Scripts/PK MINIGAME/`
+대상 씬: MiniGame_PK. 스크립트: `Assets/Scripts/PK MINIGAME/`
 - `PKKicker.cs`: 마우스로 곡선 궤적 직접 그리기 → 확정 후 파워 게이지 단계, 10초 제한(초과 시 약한 기본 슛)
 - `PKPowerGauge.cs`: 클릭으로 게이지 정지, Perfect 존과의 거리로 정확도(오차량) 산출
 - `PKTrajectoryUtil.cs`: 정확도 → 원본 궤적에 오차 적용해 실제 궤적 생성
@@ -46,14 +49,43 @@
 - 대상 씬: MiniGame1. 스크립트: `Assets/Scripts/FPS MINIGAME/`
 - 1대1 총격전, 라운드제(3선승, 최대 5라운드)
 
-## README.md 구성 (main 브랜치)
-개발 환경 / 씬 구성 / 프로젝트 구조 / 미니게임(FPS·PK·LavaRiver·TheRift) / 스크린샷(자리만, 이미지 추가 예정) / 향후 계획(미니게임 추가 예정, Claude 활용 TC 작성 및 QA 예정) / 버전 관리
+## 3D 오목(입체 오목) 미니게임 — 스크립트 작성 완료, 씬 생성됨(컴포넌트 배치 확인 필요)
+대상 씬: `MiniGame_Gomoku3D`(사용자가 생성 완료). 스크립트: `Assets/Scripts/GOMOKU MINIGAME/` (7개). 상세 구현 히스토리(버그 수정 과정 등)는 `changelog.md`의 2026-08-13~14 항목 참고.
 
-## 아직 사용자가 직접 해야 하는 작업
+- 규칙: 15x15x15 그리드(3375칸, 표준 오목판 15x15를 정육면체로 확장), 커넥트4처럼 (x,y) 교차점에 중력 배치 → z는 자동 결정(최대 15층), 13방향(축3+평면대각6+입체대각4) 검사로 5목 승리, 무승부는 보드가 가득 찼을 때
+- `GomokuGrid.cs`: 순수 C# 클래스(MonoBehaviour 아님). 보드 데이터/배치/조회/초기화. `GomokuGrid.Size = 15`를 다른 스크립트가 전부 참조하므로 크기 값만 바꾸면 전체 반영됨
+- `GomokuWinChecker.cs`: static 유틸(PK의 `PKGoalZones`/`PKTrajectoryUtil`과 동일 컨벤션). 13방향 승리 판정 + 승리 라인 좌표 반환
+- `GomokuTurnManager.cs`: `MonoBehaviourPun` 싱글턴(`Instance`). 아래 세 가지를 전부 같은 PhotonView RPC로 동기화:
+  - 돌 배치: `RequestPlace`→`RPC_PlaceStone` (결정론적 로직이라 좌표+플레이어 번호만 전송)
+  - 상대 아바타 머리 회전: `ReportLocalHeadLook`→`RPC_UpdateHeadLook`(초당 약 20회 스로틀)→`OnOpponentHeadLook` 이벤트로 전달
+  - 보드 90도 회전(Q/E): `RequestRotateBoard`→`RPC_RotateBoard`. **현재 턴인 로컬 플레이어만 가능**(`IsLocalTurn()` 재사용, 게임 종료 시 자동 차단), 턴을 소모하지 않는 자유 행동
+  - `PhotonNetwork.IsConnected` 아니면 로컬 핫싯 모드로 폴백. `ReturnToHub()` 제공. `LocalPlayer`(1/2)는 다른 스크립트가 `Start()`에서 안전 참조 가능하도록 `Awake()`에서 확정
+- `GomokuStoneSpawner.cs`: 그리드↔월드 좌표 변환, 나무색 베이스 플레인 + 15x15 격자선(LineRenderer) + 돌(기본 Sphere, `stonePrefab` 비우면 자동 생성) 전부 런타임 자동 생성. 보드 전체(플레인+격자선+돌)가 **보드 중심에 피벗을 둔 `boardRoot`** 자식으로 묶여 있어 `SetBoardRotation()`으로 통째로 부드럽게(Slerp, 기본 0.35초) 90도씩 회전 가능. `GridToWorld()`가 `boardRoot.TransformPoint()` 기반이라 회전 중에도 항상 정확한 위치 반환(다른 스크립트는 이 함수를 통해 자동으로 회전 반영받음)
+- `GomokuInputHandler.cs`: 바둑판 지면과의 평면 수식 교차(`Plane.Raycast`) + `boardRoot` 역변환으로 (x,y) 클릭 판정 — 카메라 각도/보드 회전 각도와 무관하게 항상 정확. 선택 가능 교차점만 마커 표시(마커는 매 프레임 해당 기둥의 현재 쌓인 높이 위로 따라 올라감), Q/E 키다운 감지(턴 검증은 TurnManager가 담당)
+- `GomokuVisualHighlighter.cs`: 승리 라인 돌 색상 변경 + 펄스 애니메이션
+- `GomokuSeatedCamera.cs`: 1인칭 착석 시점(궤도 회전 아님). `GomokuTurnManager.LocalPlayer`를 보고 보드를 사이에 둔 두 좌석 중 내 자리에 배치, 우클릭 드래그로 pitch(내리면 바둑판/올리면 상대 얼굴, 제한된 범위)와 제한된 yaw만 조절. 눈높이/좌석거리는 보드 전체 폭 비율(`eyeHeightRatio 0.6155`, `seatSetbackRatio 0.375`)로 계산 — 보드 크기가 또 바뀌어도 자동으로 맞춰짐. 양쪽 좌석에 아바타(캡슐+구체, `avatarPrefab` 비우면 자동 생성) 로컬 생성, 내 아바타는 렌더러만 꺼서 안 보이게 하고 머리 회전만 RPC로 상대에게 전파
+- Common의 `MiniGameManager.cs`(플레이어 아바타 스폰 전제)는 재사용하지 않음 — 보드 게임 특성상 물리 아바타가 필요 없어 `GomokuTurnManager`가 자체적으로 턴/종료 흐름을 관리
+
+### 아직 사용자가 직접 해야 하는 작업 (3D 오목)
+1. ~~`Assets/Scenes/MiniGame_Gomoku3D.unity` 씬 생성~~ — 완료(2026-08-14)
+2. 빈 GameObject에 `GomokuTurnManager` 부착 + **PhotonView 컴포넌트 추가**(Scene 소유로 설정) — `photonView.RPC` 호출에 필요
+3. 빈 GameObject에 `GomokuStoneSpawner`, `GomokuVisualHighlighter`, `GomokuInputHandler` 각각 부착(같은 오브젝트에 몰아도 무방). 서로 참조 필드는 비워두면 `FindAnyObjectByType`로 자동 탐색됨
+4. Main Camera에 `GomokuSeatedCamera` 부착(`spawner` 비워두면 자동 탐색되므로 좌표 수동 계산 불필요)
+5. `GomokuInputHandler.targetCamera` 연결(비워두면 `Camera.main` 자동 사용)
+6. (선택) 턴 안내/결과 UI(TMP 텍스트, 결과 패널) 제작 후 `GomokuTurnManager`의 `turnText`/`resultPanel`/`resultText` 필드에 연결 — 비워두면 UI 없이도 로직은 정상 동작
+7. "허브로 나가기" 버튼 제작 후 `GomokuTurnManager.ReturnToHub()`를 OnClick에 연결(PK처럼 Esc 일시정지 UI는 미포함 상태)
+8. `GameScene`의 미니게임 선택 UI에 `MiniGameSelector.LoadMiniGame("MiniGame_Gomoku3D")` 호출 버튼 추가
+9. 돌 프리팹(`stonePrefab`)/바둑판 재질(`boardMaterial`)/좌석 아바타(`GomokuSeatedCamera.avatarPrefab`)를 커스텀으로 쓰고 싶으면 각각 연결(전부 비워두면 자동 생성). `Assets/Materials/Gomoku/`에 사용자가 재질 작업 중인 것으로 보임(2026-08-14 확인)
+10. MiniGame_PK 사례처럼 ParrelSync로 로컬 2클라이언트 접속해 실제 2인 플레이 테스트
+
+## README.md 구성 (main 브랜치)
+개발 환경 / 씬 구성 / 프로젝트 구조 / 미니게임(FPS·PK·LavaRiver·Gomoku3D) / 스크린샷(자리만, 이미지 추가 예정) / 향후 계획 / 버전 관리
+
+## 아직 사용자가 직접 해야 하는 작업 (PK)
 1. 골키퍼 Animator Controller에 `GoalkeeperDive1`~`GoalkeeperDive6` 트리거 6개 추가 + 다이빙 클립 연결
 2. `PKGoalkeeperCursor`가 Canvas 자식으로 배치되어 있는지 확인
 3. 각 PK 스크립트 인스펙터 레퍼런스 연결 확인(특히 `PKUIManager.timerText`는 신규 필드라 UI 요소를 새로 만들어 연결해야 함)
-4. MiniGame2 씬에서 2인 실제 플레이 테스트, 카메라/오차감/타이머 체감 튜닝
+4. MiniGame_PK 씬에서 2인 실제 플레이 테스트, 카메라/오차감/타이머 체감 튜닝
 5. README.md 스크린샷/이미지 추가
 
 ## Git 저장소 공개 여부
@@ -64,8 +96,10 @@
 ## 미니게임별 feature 브랜치
 - master에서 개별 분기(형제 관계, 계층 아님), 완료 후 각각 master로 병합하는 방식으로 운영하기로 함
 - 현재 생성 및 origin push 완료: `feature/fps-minigame`, `feature/pk-minigame`, `feature/lavariver-minigame` (모두 master 최신 커밋 기준, 아직 병합 전)
-- `TheRift`는 씬 파일만 있고 연결된 스크립트 없어 제외 (요청 시 추가 가능)
+- `feature/gomoku3d-minigame`: 로컬에 생성 완료(2026-08-13), **origin push 전**. 3D 오목 스크립트 작업 중(현재 브랜치)
+- `TheRift`는 씬 자체가 삭제되어 더 이상 해당 없음
 
 ## 다음 세션 참고
 - 세션 시작 시 이 파일을 먼저 읽고 구조/진행상황 파악할 것
+- 3D 오목: 스크립트는 완성 상태. Unity 에디터에서 컴포넌트 배치/PhotonView 추가/UI 연결이 어디까지 진행됐는지 먼저 확인할 것(위 체크리스트 참고)
 - SAVE 명령 시: (1) 이 파일 갱신 (2) 이전 내용은 날짜와 함께 changelog.md로 이관 (3) main의 README.md도 최신화

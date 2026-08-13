@@ -18,11 +18,14 @@ EditorBuildSettings:
     path: Assets/Scenes/MiniGame1.unity
     guid: 8e338fcd0db75ff4dbdf108e60b5798b
   - enabled: 1
-    path: Assets/Scenes/MiniGame2.unity
+    path: Assets/Scenes/MiniGame_PK.unity
     guid: f79df2dedbacf10448ca5e634a6136ea
   - enabled: 1
     path: Assets/Scenes/MiniGame_LavaRiver.unity
     guid: 57f30da449fd80146ab532e79570d2a7
+  - enabled: 1
+    path: Assets/Scenes/MiniGame_Gomoku3D.unity
+    guid: ef12ffb49b04a1e4a942f1ef5ec95673
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
