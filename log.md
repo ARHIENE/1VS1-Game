@@ -17,7 +17,7 @@
 - GameScene: 메인 게임 씬 → GameManager.cs, MiniGameSelector.cs
 - MiniGame1: FPS 미니게임 전용 씬
 - MiniGame_PK: PK(승부차기) 미니게임 전용 씬 (구 `MiniGame2.unity`, 2026-08-14 사용자가 네이밍 일관성 위해 리네임)
-- MiniGame_LavaRiver: 아직 스크립트 연결 확인 안 됨(직접 참조 스크립트 없음)
+- MiniGame_LavaRiver: LoL류 AOS 스타일 1대1 미니게임. 전용 스크립트 폴더는 없지만 `Common/AOSController.cs`(이동/스킬/블링크/체력/사망) + `Unused/ChainProjectile.cs`(Q 스킬 투사체, Fireball 프리팹에 부착) + `Unused/AOSCameraFollow.cs`(런타임 부착 카메라)가 `PlayerSetup.cs`의 씬 이름 분기로 활성화되어 실질적으로 상당 부분 구현되어 있음(2026-08-14 유니티AI 답변 + GUID 참조 검색으로 재확인, 예전 "스크립트 연결 미확인" 기재는 오기재였음). 다만 같은 폴더의 `DeathZone.cs`(용암 사망 존 처리용으로 보임)는 실제로 어떤 씬/프리팹에도 부착되어 있지 않아 미사용 — 용암에 빠져도 별도 처리 없음. 자세한 조작법/구현은 `feature/lavariver-minigame` 브랜치 README.md 참고
 - MiniGame_Gomoku3D: 3D 오목 미니게임 전용 씬 (2026-08-14 사용자가 신규 생성, 컴포넌트 배치는 진행 상황 확인 필요)
 - ~~TheRift~~: 2026-08-14 사용자가 삭제(스크립트 연결 없어서 정리)
 
@@ -30,7 +30,7 @@
 - `FPS MINIGAME/` FPS 전용
 - `PK MINIGAME/` PK 전용 (아래 참고)
 - `GOMOKU MINIGAME/` 3D 오목 전용 (아래 참고)
-- `Unused/` AOSCameraFollow, AnimatorFixer, ChainProjectile, DeathZone — 어떤 씬에서도 직접 참조 미확인
+- `Unused/` AOSCameraFollow, AnimatorFixer, ChainProjectile, DeathZone — 폴더명과 달리 `AOSCameraFollow`/`ChainProjectile`은 LavaRiver 미니게임에서 실제 사용 중(위 참고), `AnimatorFixer`/`DeathZone`만 실제 미사용으로 확인됨(2026-08-14 재확인)
 
 ## PK(승부차기) 미니게임 — 스펙대로 전면 재구현 완료
 대상 씬: MiniGame_PK. 스크립트: `Assets/Scripts/PK MINIGAME/`
