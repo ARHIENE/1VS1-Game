@@ -1,5 +1,19 @@
 # 변경 이력
 
+## 2026-08-23 — 파사볼로 대결(Pasabolo Duel) 미니게임 신규 구현
+
+사용자가 스페인 전통 스포츠 '파사볼로 타블론' 모티브의 신규 미니게임 스펙 제공. 슬링샷으로 공을 발사해 핀 3개를 쳐서 날린 거리를 라운드별로 누적, 합계가 높은 쪽이 승리하는 턴제 게임. Plan 모드로 진입해 Explore 에이전트 3개를 병렬로 띄워 기존 미니게임의 Photon 동기화 패턴/카메라·입력 패턴/씬 스캐폴딩 컨벤션을 조사한 뒤 구현.
+
+**핵심 아키텍처 결정 (사용자 확인 완료)**
+- **물리 동기화 방식이 프로젝트 최초 사례**: 오목/PK는 전부 "입력만 RPC로 보내고 양쪽이 동일 로직 재현" 또는 "결과 경로를 계산해 RPC로 보내고 재생" 방식만 사용해 실시간 Rigidbody 물리 동기화 전례가 전혀 없었음. 이번엔 공-핀 충돌이 핵심이라 **마스터 클라이언트 권위 방식** 채택 — 마스터만 실제 `AddForce`/충돌 시뮬레이션 실행, 비마스터는 Rigidbody를 `isKinematic`으로 돌리고 `PhotonTransformView`(이미 `NetPlayer.prefab`에서 검증된 컴포넌트)로 위치만 수신
+- rayas(득점선) 가중치 채점 시스템 포함 결정, 랜덤 마찰/습기 구간은 스펙에도 선택 사항으로 명시돼 있어 이번엔 제외하고 추후 확장으로 보류
+
+**스크립트 7개 신규 작성** (`Assets/Scripts/PASABOLO MINIGAME/`): `PasaboloTurnManager`(MonoBehaviourPun 싱글턴, 턴/점수/RPC 중계), `PasaboloPhysicsController`(마스터 전용 물리 시뮬레이션+정지 감지+거리 계산), `PasaboloRayasScorer`(static 거리→점수 유틸), `PasaboloTableSpawner`(테이블/득점선 완전 자동 생성, 공/핀은 PhotonView가 필요해 씬에 미리 배치된 오브젝트의 외형/Rigidbody만 자동 보강), `PasaboloLaunchController`(레이-평면 교차 기반 슬링샷 드래그 입력, PKKicker 기법 재사용), `PasaboloPowerGaugeUI`(런타임 생성 파워 게이지), `PasaboloCameraController`(Aim→Flight→Result 3단계 동적 카메라, Cinemachine 미사용 확인 후 손수 Lerp/Slerp로 구현).
+
+**브랜치 처리 — 예상 밖의 git 복잡도**: 스크립트 작성 후 사용자가 Unity AI로 씬 생성/컴포넌트 배치/GameScene 허브 버튼 연결까지 직접 진행(feature/gomoku3d-minigame 브랜치 working tree 위에서 작업). SAVE 시점에 새 feature 브랜치를 만들려 했으나, GameScene.unity·EditorBuildSettings.asset·PhotonServerSettings.asset(RPC 목록)이 이미 Gomoku3D가 커밋해둔 상태 위에 얹혀 있어 그대로 가져가면 "형제 브랜치가 master에서 깨끗하게 분기"라는 기존 컨벤션이 깨짐(기존 fps/pk/lavariver/gomoku3d 4개는 전부 master에서 직접 분기됨을 git merge-base로 재확인). 사용자에게 확인 후 **master에서 깨끗하게 분기**하는 쪽으로 결정 → `git worktree`로 master 기준 임시 작업공간을 만들어 스크립트/씬/EditorBuildSettings(씬 엔트리 1줄 추가)/PhotonServerSettings(RPC 2개 추가)만 반영해 커밋. GameScene.unity 허브 버튼은 gomoku3d 브랜치의 씬 컨텍스트가 얽혀 있어 패치가 깨끗하게 적용되지 않아(`git apply` 안전하게 거부, 파일 손상 없음) 이관 포기 — 복잡한 씬 YAML을 손으로 짜맞추지 않는다는 원칙 유지. `feature/pasabolo-duel-minigame` 브랜치에 전용 README.md 추가 후 origin push 완료. 이 브랜치에서는 GameScene 허브 버튼 연결을 별도로 다시 해야 함(README에 명시)
+
+**남은 작업**: `feature/gomoku3d-minigame` 브랜치 working tree(사용자의 실제 로컬 Unity 프로젝트)에는 Pasabolo 관련 변경사항이 전부 커밋되지 않은 상태로 남아 있음(의도적 — SAVE 규칙상 새 미니게임은 전용 브랜치로만 분리, 현재 브랜치는 건드리지 않음). 사용자가 로컬에서 계속 테스트하다 별도로 커밋하고 싶으면 직접 처리 필요. 공/핀 오브젝트의 PhotonView/PhotonTransformView 부착 여부 등 Unity Editor 쪽 실제 완료 상태는 다음 세션에서 확인 필요.
+
 ## 2026-08-12 — 최초 log.md 작성 시점 스냅샷
 - Unity + Photon(PUN2) 기반 멀티플레이어 미니게임 모음 프로젝트로 파악
 - 씬: LauncherScene, LobbyScene, GameScene, MiniGame1, MiniGame2, MiniGame_LavaRiver, TheRift
