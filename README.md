@@ -18,6 +18,7 @@ Unity + Photon(PUN2) 기반 1대1 멀티플레이어 미니게임 모음 프로�
 | `MiniGame_PK` | PK(승부차기) 미니게임 |
 | `MiniGame_LavaRiver` | 라바리버 - AOS(LoL류) 스타일 미니게임 |
 | `MiniGame_Gomoku3D` | 3D 오목(입체 오목) 미니게임 |
+| `MiniGame_PasaboloDuel` | 파사볼로 대결 - 슬링샷 거리 경쟁 미니게임 |
 
 ## 프로젝트 구조
 
@@ -31,6 +32,7 @@ Assets/
 │   ├── FPS MINIGAME/   # FPS 미니게임 전용
 │   ├── PK MINIGAME/    # PK 승부차기 미니게임 전용
 │   ├── GOMOKU MINIGAME/ # 3D 오목 미니게임 전용
+│   ├── PASABOLO MINIGAME/ # 파사볼로 대결 미니게임 전용
 │   └── Unused/          # 미사용/미배치 스크립트
 ├── Scenes/
 ├── Resources/
@@ -67,6 +69,14 @@ Assets/
 - 체력이 0이 되면 잠시 후 반대편 스폰 지점에서 리스폰, 시간에 따라 체력 자동 회복
 - 캐릭터가 25배 크기로 스케일업되어 광활한 지형 위에서 싸우는 느낌으로 연출됨
 
+### 파사볼로 대결 (Pasabolo Duel)
+
+- 스페인 전통 스포츠 '파사볼로 타블론' 모티브의 턴제 거리 경쟁 게임
+- 공을 클릭해 슬링샷처럼 반대 방향으로 당겼다 놓으면 발사, 판 위 핀 3개를 맞혀 날아간 거리를 raya(득점선) 가중치로 채점
+- 한 플레이어당 기본 3턴, 라운드 종료 후 누적 점수 합계가 높은 쪽 승리
+- 조준 중엔 공을 따라가는 근접 시점, 발사 후엔 핀을 추적하는 시점, 정지 후엔 판 전체를 조망하는 시점으로 자동 전환
+- 공-핀 충돌은 실제 물리 시뮬레이션(마스터 클라이언트 권위 방식으로 동기화)
+
 ## 스크린샷
 
 (추가 예정)
@@ -80,4 +90,4 @@ Assets/
 
 - Git / GitHub 사용
 - 브랜치: `main`(README 전용), `master`(실제 작업 브랜치, 프로젝트 전체 파일) — 두 브랜치는 공통 조상 없는 별개 히스토리
-- 미니게임별 feature 브랜치: `feature/fps-minigame`, `feature/pk-minigame`, `feature/lavariver-minigame`, `feature/gomoku3d-minigame` — master에서 분기, 완료 시 각각 master로 병합
+- 미니게임별 feature 브랜치: `feature/fps-minigame`, `feature/pk-minigame`, `feature/lavariver-minigame`, `feature/gomoku3d-minigame`, `feature/pasabolo-duel-minigame` — master에서 분기, 완료 시 각각 master로 병합
